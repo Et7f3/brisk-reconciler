@@ -45,11 +45,11 @@ type element('node) =
 and component('a) = {
   debugName: string,
   key: int,
-  id: componentId(instance('a)),
+  id: (componentId(instance('a)), int),
   childrenType: childrenType('viewSpec),
   eq:
     'other.
-    ('other, componentId('other), componentId(instance('a))) =>
+    ('other, (componentId('other), int), (componentId(instance('a)), int)) =>
     option(instance('a)),
 
   render:
@@ -1662,6 +1662,7 @@ module Expert = {
       ) =>
       element(node) =
     (~useDynamicKey=false, debugName) => {
+      let hash = Hashtbl.hash(debugName);
       module Component = {
         type componentId('a) +=
           | Id: componentId(
@@ -1677,12 +1678,12 @@ module Expert = {
           type c.
             (
               c,
-              componentId(c),
-              componentId(
+              (componentId(c), int),
+              (componentId(
                 instance(
                   (a, (node, element(node), node, lazyHostNodeList(node))),
                 ),
-              )
+              ), int)
             ) =>
             option(
               instance(
@@ -1691,7 +1692,8 @@ module Expert = {
             ) =
           (instance, id1, id2) => {
             switch (id1, id2) {
-            | (Id, Id) => Some(instance)
+            | ((_, n1), (_, n2)) when n1 == n2 => Some(Obj.magic(instance))
+            | ((Id, _), (Id, _)) => Some(instance)
             | (_, _) => None
             };
           };
@@ -1703,7 +1705,7 @@ module Expert = {
             debugName,
             childrenType: React,
             key: useDynamicKey ? Key.dynamicKeyMagicNumber : Key.none,
-            id: Component.Id,
+            id: (Component.Id, hash),
             eq: Component.eq,
             render,
           },
@@ -1721,6 +1723,7 @@ module Expert = {
       ) =>
       element(node) =
     (~useDynamicKey=false, debugName) => {
+      let hash = Hashtbl.hash(debugName);
       module Component = {
         type componentId('a) +=
           | Id: componentId(
@@ -1741,8 +1744,8 @@ module Expert = {
           type c.
             (
               c,
-              componentId(c),
-              componentId(
+              (componentId(c), int),
+              (componentId(
                 instance(
                   (
                     a,
@@ -1754,7 +1757,7 @@ module Expert = {
                     ),
                   ),
                 ),
-              )
+              ), int)
             ) =>
             option(
               instance(
@@ -1771,7 +1774,8 @@ module Expert = {
             ) =
           (instance, id1, id2) => {
             switch (id1, id2) {
-            | (Id, Id) => Some(instance)
+            | ((_, n1), (_, n2)) when n1 == n2 => Some(Obj.magic(instance))
+            | ((Id, _), (Id, _)) => Some(instance)
             | (_, _) => None
             };
           };
@@ -1783,7 +1787,7 @@ module Expert = {
             debugName,
             childrenType: Host,
             key: useDynamicKey ? Key.dynamicKeyMagicNumber : Key.none,
-            id: Component.Id,
+            id: (Component.Id, hash),
             eq: Component.eq,
             render,
           },
