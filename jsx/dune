@@ -2,6 +2,6 @@
  (name brisk_ppx)
  (public_name brisk-reconciler.ppx)
  (kind ppx_rewriter)
- (libraries ppxlib)
+ (libraries ppxlib unix)
  (preprocess
   (pps ppxlib.metaquot)))

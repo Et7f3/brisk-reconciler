@@ -210,7 +210,7 @@ module Declaration_ppx = struct
           ^:: nil ))
       (fun ~loc ~path recursive pat expr ->
         let component_name =
-          ATH.Exp.constant ~loc (ATH.Const.string (path ^ "." ^ pat))
+          ATH.Exp.constant ~loc (ATH.Const.string ((string_of_float (Unix.gettimeofday ())) ^ path ^ "." ^ pat))
         in
         let transformed_expression =
           transform_component_expr ~useDynamicKey:false ~attribute
